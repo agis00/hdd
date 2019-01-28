@@ -1,0 +1,101 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Net.Mail;
+using System.Diagnostics;
+
+
+namespace EPR_Email
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {       
+            // เคลียร์ ค่า ตัวแปร
+            string sum_char = "";
+            int ii = 0;
+            string to = "";
+            string cc = "";
+            string sub = "";
+            string att = "";
+            string body = "";
+
+            // รวมตัวอักษรจาก COMMAND LINE
+            foreach (string s in args){
+                if (s.Trim() != "")
+                {
+                    sum_char = sum_char +" " + s;
+                }
+              
+            } // for sum_char
+
+            // แยกตัวอักษร ออกโดยที่ลบตัว [ ]
+            string[] split_st = sum_char.Split(new Char[] { '[', ']' });
+                     
+            // หาค่าในแต่ละตัว ถ้าเจอที่ต้องการจะเอาตัวถัดไปมาใส่ตัวแปร
+            foreach (string d in split_st)
+            {
+                
+                if (d.Trim() != "")
+                {
+                    if (d.Trim() == "-To")
+                    {
+
+                        to = split_st[ii + 1];
+
+
+                    }
+
+                    if (d.Trim() == "-CC")
+                    {
+
+                        cc = split_st[ii + 1];
+
+                    }
+
+                    if (d.Trim() == "-Subj")
+                    {
+
+                        sub = split_st[ii + 1];
+
+                    }
+                    if (d.Trim() == "-Attch")
+                    {
+
+                        att = split_st[ii + 1];
+                    }
+                    if (d.Trim() == "-Body")
+                    {
+
+                        body = split_st[ii + 1];
+                    }
+                    ii = ii + 1;
+                   
+
+                }
+                   
+            } // foreach split to var
+
+            // ส่งเมล ****** to sub body form send
+            SmtpClient SmtpServer = new SmtpClient("smtpa.csloxinfo.com");
+
+            var email = new MailMessage();
+            email.To.Add(to);
+            email.Subject = sub;
+            email.IsBodyHtml = true;
+            email.BodyEncoding = System.Text.Encoding.UTF8;
+            email.Body = body;
+            email.From = new MailAddress("epr.system@crownceramics.com");
+
+
+            SmtpServer.Port = 587;
+            SmtpServer.UseDefaultCredentials = false;
+            SmtpServer.Credentials = new System.Net.NetworkCredential("epr.system@crownceramics.com", "Epr1590004");
+            SmtpServer.EnableSsl = true;
+            SmtpServer.Send(email);
+            Console.Write("Send Mail.....OK");
+
+        }
+    }
+}
